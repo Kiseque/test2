@@ -1,0 +1,15 @@
+{
+    "name": "admin/papa",
+    "autoload": {
+        "psr-4": {
+            "app\\": "./"
+        }
+    },
+    "authors": [
+        {
+            "name": "Kiseque",
+            "email": "kisekovsky@gmail.com"
+        }
+    ],
+    "require": {}
+}
