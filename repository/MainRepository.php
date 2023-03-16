@@ -4,7 +4,7 @@ namespace app\repository;
 
 use app\controller\MainController;
 use app\dbConnect;
-$counter = 0;
+
 class MainRepository
 {
     private dbConnect $dbConnect;
@@ -68,28 +68,5 @@ class MainRepository
         $params = [[strval($name), 'string'], [intval($parent_id), 'int'], [intval($id), 'int']];
         $this->dbConnect->query($sql, $params);
     }
-    public function updateRow($column, $value, $id)
-    {
-        $sql = str_replace('{{column}}', $column, file_get_contents(__DIR__ . '/sql/updateName.sql'));
-        if ($column === 'name' && count($this->getRow($id)) === 1) {
-            $params = [[strval($value), 'string'], [intval($id), 'int']];
-            $this->dbConnect->query($sql, $params);
-            echo "Переименование прошло успешно";
-        } else if ($column === 'parent_id' && count(getRow($id)) === 1 && $value !== $id && (count(getRow($value)) === 1 || $value == 0) || $value == null) {
-            $temp = array_column(getRow($id), 'parent_id');
-            $params = [[strval($value), 'int'], [intval($id), 'int']];
-            $this->dbConnect->query($sql, $params);
-            if(countElems('1') == count(selectTree())) {                   //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                echo "Успешно";
-            } else {
-                echo "Произошла ошибка";
-                $params = [[$temp[0], 'int'], [intval($id), 'int']];
-                $this->dbConnect->query($sql, $params);
-            }
-        } else {
-            echo "Error";
-        }
-    }
-
 
 }
