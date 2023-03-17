@@ -15,4 +15,8 @@ class DocumentController
         $this->documentService->csvCreate();
     }
 
+    public function csvRead()
+    {
+        $this->documentService->csvRead();
+    }
 }

@@ -6,14 +6,11 @@ use app\controller\MainController;
 use app\controller\DocumentController;
 $main = new MainController();
 
-extract (checkAndPrepareParams($_REQUEST,
+extract(checkAndPrepareParams($_REQUEST,
 [
     'act', 'method'
 ]));
 
-if ($act === 'main' && $method == 'getTree') {
-    $main->getTree();
-}
 
 switch ($act) {
     case 'main':
@@ -56,10 +53,13 @@ function mainFunctions($method)
 
 function documentFunctions($method)
 {
-    $main = new DocumentController();
+    $document = new DocumentController();
     switch ($method) {
         case 'csvCreate':
-            $main->csvCreate();
+            $document->csvCreate();
+            break;
+        case 'csvRead':
+            $document->csvRead();
             break;
         default:
             throw new Exception('Unknown document function');
