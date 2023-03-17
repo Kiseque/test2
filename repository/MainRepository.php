@@ -2,7 +2,6 @@
 
 namespace app\repository;
 
-use app\controller\MainController;
 use app\dbConnect;
 
 class MainRepository

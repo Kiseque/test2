@@ -55,7 +55,7 @@ class dbConnect
 
         $sqlQuery->execute();
 
-        return $sqlQuery->fetchAll(PDO::FETCH_ASSOC);;
+        return $sqlQuery->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
