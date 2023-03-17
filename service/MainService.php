@@ -55,7 +55,7 @@ class MainService
         }
     }
 
-    public function deleteRecuirsiveRow($id)
+    private function deleteRecuirsiveRow($id)
     {
         $children = array_column($this->mainRepository->getByParent($id), 'ID');
         if (!empty($children)) {
@@ -66,7 +66,7 @@ class MainService
         $this->mainRepository->deleteRow($id);
     }
 
-    public function countElems($id)
+    private function countElems($id)
     {
         static $counter = 0;
         if ($counter > count($this->mainRepository->getTree())) {
