@@ -62,9 +62,9 @@ class MainRepository
         $this->dbConnect->query($sql, $params);
     }
 
-    public function updateBoth($name, $parent_id, $id) {
+    public function updateBoth($name, $parentId, $id) {
         $sql = file_get_contents(__DIR__ . '/sql/updateBoth.sql');
-        $params = [[strval($name), 'string'], [intval($parent_id), 'int'], [intval($id), 'int']];
+        $params = [[strval($name), 'string'], [intval($parentId), 'int'], [intval($id), 'int']];
         $this->dbConnect->query($sql, $params);
     }
 
