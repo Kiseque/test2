@@ -66,9 +66,12 @@ class MainService
         $this->mainRepository->deleteRow($id);
     }
 
-    private function countElems($id)
+    private function countElems($id, $counterErase)
     {
         static $counter = 0;
+        if ($counterErase) {
+            $counter = 0;
+        }
         if ($counter > count($this->mainRepository->getTree())) {
             return $counter;
         }
@@ -76,7 +79,7 @@ class MainService
         $children = array_column($this->mainRepository->getByParent($id), 'ID');
         if (!empty($children)) {
             foreach ($children as $child) {
-                $this->countElems($child);
+                $this->countElems($child, false);
             }
         }
         return $counter;
@@ -89,7 +92,7 @@ class MainService
             if (isset($name) && isset($parent_id) && count($this->mainRepository->getRow($id)) === 1 && $parent_id !== $id && (count($this->mainRepository->getRow($parent_id)) === 1 || $parent_id == 0 || $parent_id == null)) {
                 $temp = array_column($this->mainRepository->getRow($id), 'Parent_ID');
                 $this->mainRepository->updateBoth($name, $parent_id, $id);
-                if ($this->countElems(1) > count($this->mainRepository->getTree())) {
+                if ($this->countElems(1, true) > count($this->mainRepository->getTree())) {
                     echo 'Invalid Parent_ID value';
                     $this->mainRepository->updateParent($temp[0], $id);
                 } else {
@@ -98,7 +101,7 @@ class MainService
             } elseif (isset($parent_id) && empty($name) && count($this->mainRepository->getRow($id)) === 1 && $parent_id !== $id && (count($this->mainRepository->getRow($parent_id)) === 1 || $parent_id == 0 || $parent_id == null)) {
                 $temp = array_column($this->mainRepository->getRow($id), 'Parent_ID');
                 $this->mainRepository->updateParent($parent_id, $id);
-                if ($this->countElems(1) > count($this->mainRepository->getTree())) {
+                if ($this->countElems(1, true) > count($this->mainRepository->getTree())) {
                     echo 'Invalid Parent_ID value';
                     $this->mainRepository->updateParent($temp[0], $id);
                 } else {

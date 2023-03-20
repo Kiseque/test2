@@ -11,5 +11,7 @@
             "email": "kisekovsky@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "phpoffice/phpspreadsheet": "^1.28"
+    }
 }

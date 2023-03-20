@@ -15,4 +15,13 @@ class DocumentController
         $this->documentService->csvCreate();
     }
 
+    public function csvRead()
+    {
+        $this->documentService->csvRead();
+    }
+
+    public function xlsxCreate()
+    {
+        $this->documentService->xlsxCreate();
+    }
 }
