@@ -49,6 +49,9 @@ function mainFunctions($method)
             extract(checkAndPrepareParams($_REQUEST, ['id'], ['name', 'parent_id']));
             $main->updateRow($name, $parent_id, $id);
             break;
+        case 'displayTree':
+            $main->displayTree();
+            break;
         default:
             throw new Exception('Unknown main function');
     }
@@ -66,6 +69,12 @@ function documentFunctions($method)
             break;
         case 'xlsxCreate':
             $document->xlsxCreate();
+            break;
+        case 'pdfCreate':
+            $document->pdfCreate();
+            break;
+        case 'wordCreate':
+            $document->wordCreate();
             break;
         default:
             throw new Exception('Unknown document function');
