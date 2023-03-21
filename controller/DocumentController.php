@@ -1,7 +1,8 @@
 <?php
 
 namespace app\controller;
-use app\service\DocumentService;
+use app\service\document\DocumentService;
+
 class DocumentController
 {
     private DocumentService $documentService;
@@ -10,18 +11,28 @@ class DocumentController
         $this->documentService = new DocumentService();
     }
 
-    public function csvCreate()
+    public function csvCreate(): void
     {
         $this->documentService->csvCreate();
     }
 
-    public function csvRead()
+    public function csvRead(): void
     {
         $this->documentService->csvRead();
     }
 
-    public function xlsxCreate()
+    public function xlsxCreate(): void
     {
         $this->documentService->xlsxCreate();
+    }
+
+    public function pdfCreate(): void
+    {
+        $this->documentService->pdfCreate();
+    }
+
+    public function wordCreate(): void
+    {
+        $this->documentService->wordCreate();
     }
 }

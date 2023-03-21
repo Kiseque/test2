@@ -2,7 +2,7 @@
 
 namespace app\controller;
 
-use app\service\MainService;
+use app\service\main\MainService;
 
 class MainController
 {
@@ -12,28 +12,33 @@ class MainController
         $this->mainService = new MainService();
     }
 
-    public function getTree()
+    public function getTree(): array
     {
         return $this->mainService->getTree();
     }
 
-    public function getRow($id)
+    public function getRow($id): array
     {
         return $this->mainService->getRow($id);
     }
 
-    public function insertRow($name, $id)
+    public function insertRow($name, $id): void
     {
         $this->mainService->insertRow($name, $id);
     }
 
-    public function deleteRow($id)
+    public function deleteRow($id): void
     {
         $this->mainService->deleteRow($id);
     }
 
-    public function updateRow($name, $parent_id, $id)
+    public function updateRow($name, $parent_id, $id): void
     {
         $this->mainService->updateRow($name, $parent_id, $id);
+    }
+
+    public function displayTree(): void
+    {
+        $this->mainService->displayTree();
     }
 }

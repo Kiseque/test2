@@ -1,12 +1,13 @@
 <?php
 
-namespace app\service;
+namespace app\service\main;
 
-use app\repository\MainRepository;
 use app\dbConnect;
+use app\repository\MainRepository;
+use app\service\BaseService;
 use mysql_xdevapi\Exception;
 
-class MainService
+class MainService extends BaseService
 {
     private MainRepository $mainRepository;
     private dbConnect $dbConnect;
@@ -17,17 +18,17 @@ class MainService
         $this->dbConnect = new dbConnect();
     }
 
-    public function getTree()
+    public function getTree(): array
     {
-        return $this->mainRepository->getTree();
+        return array_map('self::upperCaseName', $this->mainRepository->getTree());
     }
 
-    public function getRow($id)
+    public function getRow($id): array
     {
         return $this->mainRepository->getRow($id);
     }
 
-    public function insertRow($name, $id)
+    public function insertRow($name, $id): void
     {
         $this->dbConnect->beginTransaction();
         try {
@@ -42,7 +43,7 @@ class MainService
         }
     }
 
-    public function deleteRow($id)
+    public function deleteRow($id): void
     {
         $this->dbConnect->beginTransaction();
         try {
@@ -55,7 +56,7 @@ class MainService
         }
     }
 
-    private function deleteRecuirsiveRow($id)
+    private function deleteRecuirsiveRow($id): void
     {
         $children = array_column($this->mainRepository->getByParent($id), 'ID');
         if (!empty($children)) {
@@ -66,10 +67,15 @@ class MainService
         $this->mainRepository->deleteRow($id);
     }
 
-    private function treeLoopCheck($parentId, $id)
+    private function treeLoopCheck($parentId, $id): bool
     {
         $parent = $this->mainRepository->getRow($parentId);
         $result = true;
+        if ($parentId == 0) {
+            return true;
+        } elseif (empty($this->mainRepository->getRow($id)) || empty($this->mainRepository->getRow($parentId))) {
+            return false;
+        }
         if (!empty($parent)) {
             foreach ($parent as $value) {
                 $parentId = $value['Parent_ID'];
@@ -84,35 +90,53 @@ class MainService
         return $result;
     }
 
-    public function updateRow($name, $parentId, $id)
+    public function updateRow($name, $parentId, $id): void
     {
         $this->dbConnect->beginTransaction();
         try {
-            if (isset($name) && isset($parentId) && count($this->mainRepository->getRow($id)) === 1 && $parentId !== $id && (count($this->mainRepository->getRow($parentId)) === 1 || $parentId == 0 || $parentId == null)) {
-                $temp = array_column($this->mainRepository->getRow($id), 'Parent_ID');
-                $this->mainRepository->updateBoth($name, $parentId, $id);
-                if ($this->countElems(1, true) > count($this->mainRepository->getTree())) {
-                    echo 'Invalid Parent_ID value';
-                    $this->mainRepository->updateParent($temp[0], $id);
+            if (isset($parentId) && $parentId !== $id && $this->treeLoopCheck($parentId, $id)) {
+                if (isset($name)) {
+                    $this->mainRepository->updateBoth($name, $parentId, $id);
+                    echo "Успешное изменение полей Name, Parent_ID";
                 } else {
-                    echo 'Successfull Name and Parent_ID update';
+                    $this->mainRepository->updateParent($parentId, $id);
+                    echo "Успешное изменение поля Parent_ID";
                 }
-            } elseif (isset($parentId) && empty($name) && count($this->mainRepository->getRow($id)) === 1 && $parentId !== $id && (count($this->mainRepository->getRow($parentId)) === 1 || $parentId == 0 || $parentId == null)) {
-                if ($this->treeLoopCheck($parentId, $id)) {
-                    echo 'Nice';
-                } else {
-                    echo 'Fuck';
-                }
-            } elseif (isset($name) && empty($parentId) && count($this->mainRepository->getRow($id)) === 1) {
+            } elseif (isset($name) && empty($parentId)) {
                 $this->mainRepository->updateName($name, $id);
-                echo "Successfull Name update";
             } else {
-                echo "Error";
+                echo "Ошибка!";
             }
             $this->dbConnect->commit();
         } catch (\PDOException $e) {
             $this->dbConnect->rollBack();
             throw new Exception($e->getMessage());
         }
+    }
+
+    public function displayTree(): void
+    {
+        $result = $this->getTree();
+        $html = '<table border="1" width="300" style="border-collapse:collapse;">';
+        $html .= '<tr>';
+        foreach ($result[0] as $key=>$value){
+            $html .= '<th style="text-align:center;">' . htmlspecialchars($key) . '</th>';
+        }
+        $html .= '</tr>';
+        foreach($result as $value){
+            $html .= '<tr>';
+            foreach($value as $value2){
+                $html .= '<td style="text-align:center;">' . htmlspecialchars($value2) . '</td>';
+            }
+            $html .= '</tr>';
+        }
+        $html .= '</table>';
+        echo $html;
+    }
+
+    private function upperCaseName($row)
+    {
+        $row['Name'] = $this->mb_ucfirst($row['Name']);
+        return $row;
     }
 }
