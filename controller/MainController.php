@@ -17,22 +17,22 @@ class MainController
         return $this->mainService->getTree();
     }
 
-    public function getRow($id): array
+    public function getRow(int $id): array
     {
         return $this->mainService->getRow($id);
     }
 
-    public function insertRow($name, $id): void
+    public function insertRow(string $name, int $id): void
     {
         $this->mainService->insertRow($name, $id);
     }
 
-    public function deleteRow($id): void
+    public function deleteRow(int $id): void
     {
         $this->mainService->deleteRow($id);
     }
 
-    public function updateRow($name, $parent_id, $id): void
+    public function updateRow(? string $name, ? int $parent_id, int $id): void
     {
         $this->mainService->updateRow($name, $parent_id, $id);
     }

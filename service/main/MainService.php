@@ -23,40 +23,46 @@ class MainService extends BaseService
         return array_map('self::upperCaseName', $this->mainRepository->getTree());
     }
 
-    public function getRow($id): array
+    public function getRow(int $id): array
     {
         return $this->mainRepository->getRow($id);
     }
 
-    public function insertRow($name, $id): void
+    public function insertRow(string $name, int $id): void
     {
         $this->dbConnect->beginTransaction();
         try {
-            if (count($this->mainRepository->getRow($id)) === 1) {
+            if (!empty($this->mainRepository->getRow($id))) {
                 $this->mainRepository->insertRow($name, $id);
+            } else {
+                echo "Non-existing Parent";
             }
             $this->dbConnect->commit();
-            echo "Successfull insert";
+            echo "Successful insert";
         } catch (\PDOException $e) {
             $this->dbConnect->rollBack();
             throw new \Exception($e->getMessage());
         }
     }
 
-    public function deleteRow($id): void
+    public function deleteRow(int $id): void
     {
         $this->dbConnect->beginTransaction();
         try {
-            $this->deleteRecuirsiveRow($id);
-            $this->dbConnect->commit();
-            echo 'Successfull delete';
+            if (!empty($this->getRow($id))){
+                $this->deleteRecuirsiveRow($id);
+                $this->dbConnect->commit();
+                echo 'Successful delete';
+            } else {
+                echo 'Попытка удаления несуществующей записи';
+            }
         } catch (\PDOException $e) {
             $this->dbConnect->rollBack();
             throw new \Exception($e->getMessage());
         }
     }
 
-    private function deleteRecuirsiveRow($id): void
+    private function deleteRecuirsiveRow(int $id): void
     {
         $children = array_column($this->mainRepository->getByParent($id), 'ID');
         if (!empty($children)) {
@@ -67,7 +73,7 @@ class MainService extends BaseService
         $this->mainRepository->deleteRow($id);
     }
 
-    private function treeLoopCheck($parentId, $id): bool
+    private function treeLoopCheck(int $parentId, int $id): bool
     {
         $parent = $this->mainRepository->getRow($parentId);
         $result = true;
@@ -90,7 +96,7 @@ class MainService extends BaseService
         return $result;
     }
 
-    public function updateRow($name, $parentId, $id): void
+    public function updateRow(? string $name, ? int $parentId, int $id): void
     {
         $this->dbConnect->beginTransaction();
         try {
@@ -134,7 +140,7 @@ class MainService extends BaseService
         echo $html;
     }
 
-    private function upperCaseName($row)
+    private function upperCaseName(array $row)
     {
         $row['Name'] = $this->mb_ucfirst($row['Name']);
         return $row;

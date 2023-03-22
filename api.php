@@ -4,6 +4,8 @@ require_once __DIR__ . '/bootstrap.php';
 
 use app\controller\MainController;
 use app\controller\DocumentController;
+use app\controller\ObserverController;
+
 $main = new MainController();
 
 extract (checkAndPrepareParams($_REQUEST,
@@ -21,6 +23,9 @@ switch ($act) {
         break;
     case 'document':
         documentFunctions($method);
+        break;
+    case 'observer':
+        observerFunctions($method);
         break;
     default:
         throw new Exception('Unknown act');
@@ -42,12 +47,12 @@ function mainFunctions($method)
             $main->deleteRow($id);
             break;
         case 'insertRow':
-            extract(checkAndPrepareParams($_REQUEST, ['parent_id', 'name']));
-            $main->insertRow($name, $parent_id);
+            extract(checkAndPrepareParams($_REQUEST, ['parentId', 'name']));
+            $main->insertRow($name, $parentId);
             break;
         case 'updateRow':
-            extract(checkAndPrepareParams($_REQUEST, ['id'], ['name', 'parent_id']));
-            $main->updateRow($name, $parent_id, $id);
+            extract(checkAndPrepareParams($_REQUEST, ['id'], ['name', 'parentId']));
+            $main->updateRow($name, $parentId, $id);
             break;
         case 'displayTree':
             $main->displayTree();
@@ -78,5 +83,33 @@ function documentFunctions($method)
             break;
         default:
             throw new Exception('Unknown document function');
+    }
+
+    function observerFunctions($method)
+    {
+        $observer = new ObserverController();
+        switch ($method) {
+            case 'getAllObservers':
+                $observer->getAllObservers();
+                break;
+            case 'getObserver':
+                extract(checkAndPrepareParams($_REQUEST, ['id']));
+                $observer->getObserver($id);
+                break;
+            case 'deleteObserver':
+                extract(checkAndPrepareParams($_REQUEST, ['id']));
+                $observer->deleteObserver($id);
+                break;
+            case 'insertObserver':
+                extract(checkAndPrepareParams($_REQUEST, ['name']));
+                $observer->insertObserver($name);
+                break;
+            case 'updateObserver':
+                extract(checkAndPrepareParams($_REQUEST, ['id', 'name']));
+                $observer->updateObserver($name, $parentId, $id);
+                break;
+            default:
+                throw new Exception('Unknown observer function');
+        }
     }
 }
