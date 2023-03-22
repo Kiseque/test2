@@ -76,13 +76,11 @@ class DocumentService extends BaseService
         foreach ($result[0] as $key=>$value) {
             $pdf->Cell(40, 8, $key, 1, null, 'C');
         }
-        $pdf->Ln();
         $pdf->SetFont('Times', null, 14);
         foreach ($result as $value) {
-            $pdf->Cell(40, 8, $value['ID'], 1, null, 'C');
-            $pdf->Cell(40, 8, $value['Name'], 1, null, 'C');
-            $pdf->Cell(40, 8, $value['Parent_ID'], 1, null, 'C');
             $pdf->Ln();
+            foreach ($value as $item)
+            $pdf->Cell(40, 8, $item, 1, null, 'C');
         }
         $pdf->Output();
     }
@@ -90,7 +88,30 @@ class DocumentService extends BaseService
     public function wordCreate(): void
     {
         $word = new PhpWord();
-        $word->setDefaultFontName('Times New Roman');
-        $word->setDefaultFontSize(14);
+        $section = $word->addSection();
+        $tableStyle = array ('borderColor' => '000000', 'borderSize' => 6);
+        $table = $section->addTable($tableStyle);
+        $table->addRow();
+        $output = $this->mainService->getTree();
+        foreach ($output[0] as $key=>$value) {
+            $cell = $table->addCell(2000);
+            $cell->addText($key, ['name'=>'Times New Roman', 'size'=>14, 'bold'=>true], ['align' => 'center']);
+        }
+        foreach ($output as $item) {
+            $table->addRow();
+            foreach ($item as $item2) {
+                $cell = $table->addCell(2000);
+                $cell->addText($item2, ['name'=>'Times New Roman', 'size'=>14], ['align' => 'center']);
+            }
+        }
+        $file = 'result.docx';
+        header("Content-Description: File Transfer");
+        header('Content-Disposition: attachment; filename="' . $file . '"');
+        header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        header('Content-Transfer-Encoding: binary');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Expires: 0');
+        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($word, 'Word2007');
+        $objWriter->save('php://output');
     }
 }
