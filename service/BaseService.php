@@ -12,4 +12,10 @@ class BaseService
             return $string;
         }
     }
+
+    protected function mb_ucfirst_arr(array $array)
+    {
+        $array['Name'] = $this->mb_ucfirst($array['Name']);
+        return $array;
+    }
 }

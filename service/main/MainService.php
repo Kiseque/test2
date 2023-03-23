@@ -23,7 +23,7 @@ class MainService extends BaseService
 
     public function getTree(): array
     {
-        return array_map('self::upperCaseName', $this->mainRepository->getTree());
+        return array_map('self::mb_ucfirst_arr', $this->mainRepository->getTree());
     }
 
     public function getRow(int $id): array
@@ -33,36 +33,36 @@ class MainService extends BaseService
 
     public function insertRow(string $name, int $id): void
     {
+        if (empty($this->mainRepository->getRow($id))) {
+            echo "Non-existing Parent";
+            exit;
+        }
         $this->dbConnect->beginTransaction();
         try {
-            if (!empty($this->mainRepository->getRow($id))) {
-                $this->mainRepository->insertRow($name, $id);
-            } else {
-                echo "Non-existing Parent";
-            }
+            $this->mainRepository->insertRow($name, $id);
             $this->dbConnect->commit();
-            echo "Successful insert";
         } catch (\PDOException $e) {
             $this->dbConnect->rollBack();
             throw new \Exception($e->getMessage());
         }
+        echo "Successful insert";
     }
 
     public function deleteRow(int $id): void
     {
+        if (empty($this->getRow($id))) {
+            echo 'Попытка удаления несуществующей записи';
+            exit;
+        }
         $this->dbConnect->beginTransaction();
         try {
-            if (!empty($this->getRow($id))){
-                $this->deleteRecursiveRow($id);
-                $this->dbConnect->commit();
-                echo 'Successful delete';
-            } else {
-                echo 'Попытка удаления несуществующей записи';
-            }
+            $this->deleteRecursiveRow($id);
+            $this->dbConnect->commit();
         } catch (\PDOException $e) {
             $this->dbConnect->rollBack();
             throw new \Exception($e->getMessage());
         }
+        echo 'Successful delete';
     }
 
     private function deleteRecursiveRow(int $id): void
@@ -100,7 +100,7 @@ class MainService extends BaseService
         return $result;
     }
 
-    public function updateRow(? string $name, ? int $parentId, int $id): void
+    public function updateRow(?string $name, ?int $parentId, int $id): void
     {
         $this->dbConnect->beginTransaction();
         try {
@@ -142,11 +142,5 @@ class MainService extends BaseService
         }
         $html .= '</table>';
         echo $html;
-    }
-
-    private function upperCaseName(array $row)
-    {
-        $row['Name'] = $this->mb_ucfirst($row['Name']);
-        return $row;
     }
 }

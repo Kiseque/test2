@@ -21,7 +21,7 @@ class ObserverService extends BaseService
 
     public function getAllObservers(): array
     {
-        return array_map('self::upperCaseName', $this->observerRepository->getAllObservers());
+        return array_map('self::mb_ucfirst_arr', $this->observerRepository->getAllObservers());
     }
 
     public function getObserver(int $id): array
@@ -35,51 +35,46 @@ class ObserverService extends BaseService
         try {
             $this->observerRepository->insertObserver($name);
             $this->dbConnect->commit();
-            echo "Successful observer insert";
         } catch (\PDOException $e) {
             $this->dbConnect->rollBack();
             throw new \Exception($e->getMessage());
         }
+        echo "Successful observer insert";
     }
 
     public function deleteObserver(int $id): void
     {
+        if (empty($this->getObserver($id))) {
+            echo "Non-existing observer";
+            exit;
+        }
         $this->dbConnect->beginTransaction();
         try {
-            if (!empty($this->getObserver($id))) {
-                $this->observerRepository->deleteObserver($id);
-                $this->observationService->deleteObservationByObserverId($id);
-                echo "Successful observer delete";
-            } else {
-                echo "Non-existing observer";
-            }
+            $this->observerRepository->deleteObserver($id);
+            $this->observationService->deleteObservationByObserverId($id);
             $this->dbConnect->commit();
         } catch (\PDOException $e) {
             $this->dbConnect->rollBack();
             throw new \Exception($e->getMessage());
         }
+        echo "Successful observer delete";
     }
 
     public function updateObserver (string $name, int $id): void
     {
+        if (empty($this->getObserver($id))) {
+            echo "Non-existing observer";
+            exit;
+        }
         $this->dbConnect->beginTransaction();
         try {
-            if (!empty($this->getObserver($id))) {
-                $this->observerRepository->updateObserver($name, $id);
-                echo "Successful observer update";
-            } else {
-                echo "Non-existing observer";
-            }
+            $this->observerRepository->updateObserver($name, $id);
             $this->dbConnect->commit();
         } catch (\PDOException $e) {
             $this->dbConnect->rollBack();
             throw new \Exception($e->getMessage());
         }
+        echo "Successful observer update";
     }
 
-    private function upperCaseName(array $row)
-    {
-        $row['Name'] = $this->mb_ucfirst($row['Name']);
-        return $row;
-    }
 }

@@ -32,7 +32,7 @@ class MainController
         $this->mainService->deleteRow($id);
     }
 
-    public function updateRow(? string $name, ? int $parent_id, int $id): void
+    public function updateRow(?string $name, ?int $parent_id, int $id): void
     {
         $this->mainService->updateRow($name, $parent_id, $id);
     }

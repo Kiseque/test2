@@ -45,98 +45,119 @@ class ObservationService extends BaseService
 
     public function insertObservation(int $treeId, int $observerId): void
     {
+        if (empty($this->mainRepository->getRow($treeId)) || empty($this->observerRepository->getObserver($observerId))) {
+            echo "Error! Check TreeID or ObserverID";
+            exit;
+        }
         $this->dbConnect->beginTransaction();
         try {
-            if (!empty($this->mainRepository->getRow($treeId)) && !empty($this->observerRepository->getObserver($observerId))) {
-                $this->observationRepository->insertObservation($treeId, $observerId);
-                echo "Successful Observation insert";
+            $this->observationRepository->insertObservation($treeId, $observerId);
+            $this->dbConnect->commit();
+        } catch (\PDOException $e) {
+            $this->dbConnect->rollBack();
+            throw new \Exception($e->getMessage());
+        }
+        echo "Successful Observation insert";
+    }
+
+    public function deleteObservation(int $id): void
+    {
+        if (empty($this->observationRepository->getObservationById($id))) {
+            echo "Non-existing observation";
+            exit;
+        }
+        $this->dbConnect->beginTransaction();
+        try {
+            $this->observationRepository->deleteObservation($id);
+            $this->dbConnect->commit();
+        } catch (\PDOException $e) {
+            $this->dbConnect->rollBack();
+            throw new \Exception($e->getMessage());
+        }
+        echo "Successful Observation delete";
+    }
+
+    public function updateObservation (?int $treeId, ?int $observerId, int $id): void
+    {
+        if (empty($this->getObservationById($id))) {
+            echo "Non-existing observation";
+            exit;
+        }
+        $this->dbConnect->beginTransaction();
+        try {
+            if (isset($treeId)) {
+                $check1 = $this->checkTreeIdExistence($treeId);
+            }
+            if (isset($observerId)) {
+                $check2 = $this->checkObserverIdExistence($observerId);
+            }
+            if (isset($treeId, $observerId)) {
+                if ($check1 && $check2) {
+                    $this->observationRepository->updateObservationAll($treeId, $observerId, $id);
+                } else {
+                    throw new \Exception('Error!');
+                }
+            } elseif (isset($treeId)) {
+                if ($check1) {
+                    $this->observationRepository->updateObservationTreeId($treeId, $id);
+                }
+            } elseif (isset($observerId)) {
+                if ($check2) {
+                    $this->observationRepository->updateObservationObserverId($observerId, $id);
+                }
             } else {
-                echo "Error! Check TreeID or ObserverID";
+                echo "Проверьте правильность ввода параметров";
             }
             $this->dbConnect->commit();
         } catch (\PDOException $e) {
             $this->dbConnect->rollBack();
             throw new \Exception($e->getMessage());
         }
-    }
-
-    public function deleteObservation(int $id): void
-    {
-        if (!empty($this->observationRepository->getObservationById($id))) {
-            $this->dbConnect->beginTransaction();
-            try {
-                $this->observationRepository->deleteObservation($id);
-                echo "Successful Observation delete";
-                $this->dbConnect->commit();
-            } catch (\PDOException $e) {
-                $this->dbConnect->rollBack();
-                throw new \Exception($e->getMessage());
-            }
-        } else {
-            echo "Non-existing observation";
-        }
-    }
-
-    public function updateObservation (? int $treeId, ? int $observerId, int $id): void
-    {
-        $this->dbConnect->beginTransaction();
-        if (!empty($this->observationRepository->getObservationById($id))) {
-            try {
-                if (isset($treeId) && !empty($this->mainRepository->getRow($treeId))) {
-                    if (isset($observerId) && !empty($this->observerRepository->getObserver($observerId))) {
-                        $this->observationRepository->updateObservationAll($treeId, $observerId, $id);
-                        echo "Successful TreeID and ObserverID update";
-                    } elseif (empty($observerId)) {
-                        $this->observationRepository->updateObservationTreeId($treeId, $id);
-                        echo "Successful TreeID update";
-                    }
-                } elseif (isset($observerId) && !empty($this->observerRepository->getObserver($observerId)) && empty($treeId)) {
-                    $this->observationRepository->updateObservationObserverId($observerId, $id);
-                    echo "Successful ObserverID update";
-                } else {
-                    echo "Error!";
-                }
-                $this->dbConnect->commit();
-            } catch (\PDOException $e) {
-                $this->dbConnect->rollBack();
-                throw new \Exception($e->getMessage());
-            }
-        } else {
-            echo "Non-existing observation";
-        }
+        echo "Успешное изменение записи";
     }
 
     public function deleteObservationByTreeId(int $treeId): void
     {
-        if (!empty($this->observationRepository->getObservationByTreeId($treeId))) {
-            $this->dbConnect->beginTransaction();
-            try {
-                $this->observationRepository->deleteObservationByTreeId($treeId);
-                echo "Successful Observation delete";
-                $this->dbConnect->commit();
-            } catch (\PDOException $e) {
-                $this->dbConnect->rollBack();
-                throw new \Exception($e->getMessage());
-            }
-        } else {
+        if (empty($this->observationRepository->getObservationByTreeId($treeId))) {
             echo "Non-existing observation";
+            exit;
         }
+        $this->dbConnect->beginTransaction();
+        try {
+            $this->observationRepository->deleteObservationByTreeId($treeId);
+            $this->dbConnect->commit();
+        } catch (\PDOException $e) {
+            $this->dbConnect->rollBack();
+            throw new \Exception($e->getMessage());
+        }
+        echo "Successful Observation delete";
     }
 
     public function deleteObservationByObserverId(int $observerId): void
     {
-        if (!empty($this->observationRepository->getObservationByObserverId($observerId))) {
-            $this->dbConnect->beginTransaction();
-            try {
-                $this->observationRepository->deleteObservationByObserverId($observerId);
-                echo "Successful Observation delete";
-                $this->dbConnect->commit();
-            } catch (\PDOException $e) {
-                $this->dbConnect->rollBack();
-                throw new \Exception($e->getMessage());
-            }
-        } else {
+        if (empty($this->observationRepository->getObservationByTreeId($observerId))) {
             echo "Non-existing observation";
+            exit;
         }
+        $this->dbConnect->beginTransaction();
+        try {
+            $this->observationRepository->deleteObservationByObserverId($observerId);
+            $this->dbConnect->commit();
+        } catch (\PDOException $e) {
+            $this->dbConnect->rollBack();
+            throw new \Exception($e->getMessage());
+        }
+        echo "Successful Observation delete";
     }
+
+    private function checkTreeIdExistence (int $treeId): bool
+    {
+        return !empty($this->mainRepository->getRow($treeId));
+    }
+
+    private function checkObserverIdExistence (int $observerId): bool
+    {
+        return !empty($this->observerRepository->getObserver($observerId));
+    }
+
 }

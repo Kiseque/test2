@@ -42,7 +42,7 @@ class ObservationController
         $this->observationService->deleteObservation($id);
     }
 
-    public function updateObservation(? int $treeId, ? int $observerId, int $id): void
+    public function updateObservation(?int $treeId, ?int $observerId, int $id): void
     {
         $this->observationService->updateObservation($treeId, $observerId, $id);
     }

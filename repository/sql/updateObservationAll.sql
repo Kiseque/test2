@@ -1,3 +1,3 @@
-UPDATE test_table
+UPDATE observation
 SET TreeID = ?, ObserverID = ?
 WHERE id = ?
