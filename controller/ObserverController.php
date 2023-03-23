@@ -2,38 +2,38 @@
 
 namespace app\controller;
 
-use app\service\document\DocumentService;
+use app\service\observer\ObserverService;
 
 class ObserverController
 {
-    private DocumentService $documentService;
+    private ObserverService $observerService;
     public function __construct()
     {
-        $this->documentService = new DocumentService();
+        $this->observerService = new ObserverService();
     }
 
     public function getAllObservers(): array
     {
-        return $this->documentService->getAllObservers();
+        return $this->observerService->getAllObservers();
     }
 
     public function getObserver(int $id): array
     {
-        return $this->documentService->getObserver($id);
+        return $this->observerService->getObserver($id);
     }
 
     public function insertObserver(string $name): void
     {
-        $this->documentService->insertObserver($name);
+        $this->observerService->insertObserver($name);
     }
 
     public function deleteObserver(int $id): void
     {
-        $this->documentService->deleteObserver($id);
+        $this->observerService->deleteObserver($id);
     }
 
     public function updateObserver(string $name, int $id): void
     {
-        $this->documentService->updateObserver($name, $id);
+        $this->observerService->updateObserver($name, $id);
     }
 }

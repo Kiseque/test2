@@ -5,17 +5,20 @@ namespace app\service\main;
 use app\dbConnect;
 use app\repository\MainRepository;
 use app\service\BaseService;
+use app\service\observation\ObservationService;
 use mysql_xdevapi\Exception;
 
 class MainService extends BaseService
 {
     private MainRepository $mainRepository;
     private dbConnect $dbConnect;
+    private ObservationService $observationService;
 
     public function __construct()
     {
         $this->mainRepository = new MainRepository();
         $this->dbConnect = new dbConnect();
+        $this->observationService = new ObservationService();
     }
 
     public function getTree(): array
@@ -50,7 +53,7 @@ class MainService extends BaseService
         $this->dbConnect->beginTransaction();
         try {
             if (!empty($this->getRow($id))){
-                $this->deleteRecuirsiveRow($id);
+                $this->deleteRecursiveRow($id);
                 $this->dbConnect->commit();
                 echo 'Successful delete';
             } else {
@@ -62,14 +65,15 @@ class MainService extends BaseService
         }
     }
 
-    private function deleteRecuirsiveRow(int $id): void
+    private function deleteRecursiveRow(int $id): void
     {
         $children = array_column($this->mainRepository->getByParent($id), 'ID');
         if (!empty($children)) {
             foreach ($children as $child) {
-                $this->deleteRecuirsiveRow($child);
+                $this->deleteRecursiveRow($child);
             }
         }
+        $this->observationService->deleteObservationByTreeId($id);
         $this->mainRepository->deleteRow($id);
     }
 

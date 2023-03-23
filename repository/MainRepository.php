@@ -20,52 +20,52 @@ class MainRepository
         return $this->dbConnect->query($sql);
     }
 
-    public function getRow($id): array
+    public function getRow(int $id): array
     {
         $sql = file_get_contents(__DIR__ . '/sql/getRow.sql');
-        $params = [[intval($id), 'int']];
+        $params = [[$id, 'int']];
         return $this->dbConnect->query($sql, $params);
     }
 
-    public function insertRow($name, $id): void
+    public function insertRow(string $name, int $id): void
     {
         $sql = file_get_contents(__DIR__ . '/sql/insertRow.sql');
-        $params = [[strval($name), 'string'], [intval($id), 'int']];
+        $params = [[$name, 'string'], [$id, 'int']];
         $this->dbConnect->query($sql, $params);
     }
 
-    public function getByParent($id): array
+    public function getByParent(int $id): array
     {
         $sql = file_get_contents(__DIR__ . '/sql/getByParent.sql');
-        $params = [[intval($id), 'int']];
+        $params = [[$id, 'int']];
         return $this->dbConnect->query($sql, $params);
     }
 
-    public function deleteRow($id): void
+    public function deleteRow(int $id): void
     {
         $sql = file_get_contents(__DIR__ . '/sql/deleteRow.sql');
-        $params = [[intval($id), 'int']];
+        $params = [[$id, 'int']];
         $this->dbConnect->query($sql, $params);
     }
 
-    public function updateName($name, $id): void
+    public function updateName(string $name, int $id): void
     {
         $sql = file_get_contents(__DIR__ . '/sql/updateName.sql');
-        $params = [[strval($name), 'string'], [intval($id), 'int']];
+        $params = [[$name, 'string'], [$id, 'int']];
         $this->dbConnect->query($sql, $params);
     }
 
-    public function updateParent($parent_id, $id): void
+    public function updateParent(int $parent_id, int $id): void
     {
         $sql = file_get_contents(__DIR__ . '/sql/updateParent.sql');
-        $params = [[intval($parent_id), 'int'], [intval($id), 'int']];
+        $params = [[$parent_id, 'int'], [$id, 'int']];
         $this->dbConnect->query($sql, $params);
     }
 
-    public function updateBoth($name, $parentId, $id): void
+    public function updateBoth(string $name, int $parentId, int $id): void
     {
         $sql = file_get_contents(__DIR__ . '/sql/updateBoth.sql');
-        $params = [[strval($name), 'string'], [intval($parentId), 'int'], [intval($id), 'int']];
+        $params = [[$name, 'string'], [$parentId, 'int'], [$id, 'int']];
         $this->dbConnect->query($sql, $params);
     }
 

@@ -5,15 +5,18 @@ namespace app\service\observer;
 use app\repository\ObserverRepository;
 use app\service\BaseService;
 use app\dbConnect;
+use app\service\observation\ObservationService;
+
 class ObserverService extends BaseService
 {
     private ObserverRepository $observerRepository;
     private dbConnect $dbConnect;
-
+    private ObservationService $observationService;
     public function __construct()
     {
         $this->observerRepository = new ObserverRepository();
         $this->dbConnect = new dbConnect();
+        $this->observationService = new ObservationService();
     }
 
     public function getAllObservers(): array
@@ -45,6 +48,7 @@ class ObserverService extends BaseService
         try {
             if (!empty($this->getObserver($id))) {
                 $this->observerRepository->deleteObserver($id);
+                $this->observationService->deleteObservationByObserverId($id);
                 echo "Successful observer delete";
             } else {
                 echo "Non-existing observer";
@@ -62,6 +66,7 @@ class ObserverService extends BaseService
         try {
             if (!empty($this->getObserver($id))) {
                 $this->observerRepository->updateObserver($name, $id);
+                echo "Successful observer update";
             } else {
                 echo "Non-existing observer";
             }

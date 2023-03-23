@@ -17,31 +17,31 @@ class ObserverRepository
         $sql = file_get_contents(__DIR__ . '/sql/getAllObservers.sql');
         return $this->dbConnect->query($sql);
     }
-    public function getObserver($id): array
+    public function getObserver(int $id): array
     {
         $sql = file_get_contents(__DIR__ . '/sql/getObserver.sql');
-        $params = [[intval($id), 'int']];
+        $params = [[$id, 'int']];
         return $this->dbConnect->query($sql, $params);
     }
 
-    public function insertObserver($name): void
+    public function insertObserver(string $name): void
     {
         $sql = file_get_contents(__DIR__ . '/sql/insertObserver.sql');
-        $params = [[strval($name), 'string']];
+        $params = [[$name, 'string']];
         $this->dbConnect->query($sql, $params);
     }
 
-    public function deleteObserver($id): void
+    public function deleteObserver(int $id): void
     {
         $sql = file_get_contents(__DIR__ . '/sql/deleteObserver.sql');
-        $params = [[intval($id), 'int']];
+        $params = [[$id, 'int']];
         $this->dbConnect->query($sql, $params);
     }
 
-    public function updateObserver($name, $id): void
+    public function updateObserver(string $name, int $id): void
     {
-        $sql = file_get_contents(__DIR__ . '/sql/deleteObserver.sql');
-        $params = [[strval($name), 'string'], [intval($id), 'int']];
+        $sql = file_get_contents(__DIR__ . '/sql/updateObserver.sql');
+        $params = [[$name, 'string'], [$id, 'int']];
         $this->dbConnect->query($sql, $params);
     }
 }

@@ -5,6 +5,7 @@ require_once __DIR__ . '/bootstrap.php';
 use app\controller\MainController;
 use app\controller\DocumentController;
 use app\controller\ObserverController;
+use app\controller\ObservationController;
 
 $main = new MainController();
 
@@ -12,10 +13,6 @@ extract (checkAndPrepareParams($_REQUEST,
 [
     'act', 'method'
 ]));
-
-if ($act === 'main' && $method == 'getTree') {
-    $main->getTree();
-}
 
 switch ($act) {
     case 'main':
@@ -26,6 +23,9 @@ switch ($act) {
         break;
     case 'observer':
         observerFunctions($method);
+        break;
+    case 'observation':
+        observationFunctions($method);
         break;
     default:
         throw new Exception('Unknown act');
@@ -84,9 +84,10 @@ function documentFunctions($method)
         default:
             throw new Exception('Unknown document function');
     }
+}
 
-    function observerFunctions($method)
-    {
+function observerFunctions($method)
+{
         $observer = new ObserverController();
         switch ($method) {
             case 'getAllObservers':
@@ -106,10 +107,45 @@ function documentFunctions($method)
                 break;
             case 'updateObserver':
                 extract(checkAndPrepareParams($_REQUEST, ['id', 'name']));
-                $observer->updateObserver($name, $parentId, $id);
+                $observer->updateObserver($name, $id);
                 break;
             default:
                 throw new Exception('Unknown observer function');
         }
+}
+
+function observationFunctions($method)
+{
+    $observation = new ObservationController();
+    switch ($method) {
+        case 'getAllObservations':
+            $observation->getAllObservations();
+            break;
+        case 'getObservationById':
+            extract(checkAndPrepareParams($_REQUEST, ['id']));
+            $observation->getObservationById($id);
+            break;
+        case 'getObservationByTreeId':
+            extract(checkAndPrepareParams($_REQUEST, ['treeId']));
+            $observation->getObservationByTreeId($treeId);
+            break;
+        case 'getObservationByObserverId':
+            extract(checkAndPrepareParams($_REQUEST, ['observerId']));
+            $observation->getObservationByObserverId($observerId);
+            break;
+        case 'insertObservation':
+            extract(checkAndPrepareParams($_REQUEST, ['treeId', 'observerId']));
+            $observation->insertObservation($treeId, $observerId);
+            break;
+        case 'deleteObservation':
+            extract(checkAndPrepareParams($_REQUEST, ['id']));
+            $observation->deleteObservation($id);
+            break;
+        case 'updateObservation':
+            extract(checkAndPrepareParams($_REQUEST, ['id'], ['treeId', 'observerId']));
+            $observation->updateObservation($treeId, $observerId, $id);
+            break;
+        default:
+            throw new Exception('Unknown observer function');
     }
 }
