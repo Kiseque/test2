@@ -4,6 +4,8 @@ namespace app\service\document;
 use app\service\BaseService;
 use app\service\Constants;
 use app\service\main\MainService;
+use app\service\observation\ObservationService;
+use app\service\observer\ObserverService;
 use Fpdf\Fpdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -14,10 +16,14 @@ class DocumentService extends BaseService
 {
 
     private MainService $mainService;
+    private ObservationService $observationService;
+    private ObserverService $observerService;
 
     public function __construct()
     {
         $this->mainService = new MainService();
+        $this->observationService = new ObservationService();
+        $this->observerService = new ObserverService();
     }
 
     public function csvCreate(): void
@@ -110,5 +116,32 @@ class DocumentService extends BaseService
         header('Expires: 0');
         $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($word, 'Word2007');
         $objWriter->save('php://output');
+    }
+
+    public function pdfCreateObservation(): void
+    {
+        $pdf = new Fpdf();
+        $pdf->AddPage();
+        $pdf->SetFont(Constants::PDF_FONT, Constants::PDF_BOLD_FONT, Constants::PDF_SIZE_FONT);
+        $pdf->Cell(40, 8, 'ID', 1, null, 'C');
+        $pdf->Cell(40, 8, 'TreeName', 1, null, 'C');
+        $pdf->Cell(40, 8, 'ObserverName', 1, null, 'C');
+        $result = array_map('self::idReplaceWithNames', $this->observationService->getAllObservations());
+        $pdf->SetFont(Constants::PDF_FONT, null, 14);
+        foreach ($result as $value) {
+            $pdf->Ln();
+            foreach ($value as $item)
+                $pdf->Cell(40, 8, $item, 1, null, 'C');
+        }
+        $pdf->Output();
+    }
+
+    private function idReplaceWithNames (array $result): array
+    {
+        $tree = array_column($this->mainService->getTree(), 'Name', 'ID');
+        $observer = array_column($this->observerService->getAllObservers(), 'Name', 'ID');
+        $result['ObserverID'] = $observer[$result['ObserverID']];
+        $result['TreeID'] = $tree[$result['TreeID']];
+        return $result;
     }
 }
