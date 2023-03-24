@@ -40,4 +40,9 @@ class DocumentController
     {
         $this->documentService->pdfCreateObservation();
     }
+
+    public function wordCreateObservation(): void
+    {
+        $this->documentService->wordCreateObservation();
+    }
 }

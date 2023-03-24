@@ -84,6 +84,9 @@ function documentFunctions($method)
         case 'pdfCreateObservation':
             $document->pdfCreateObservation();
             break;
+        case 'wordCreateObservation':
+            $document->wordCreateObservation();
+            break;
         default:
             throw new Exception('Unknown document function');
     }

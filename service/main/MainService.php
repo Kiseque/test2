@@ -31,6 +31,15 @@ class MainService extends BaseService
         return $this->mainRepository->getRow($id);
     }
 
+    public function getByName(string $name): array
+    {
+        return $this->mainRepository->getByName($name);
+    }
+
+    public function getByParent(int $id): array
+    {
+        return $this->mainRepository->getByParent($id);
+    }
     public function insertRow(string $name, int $id): void
     {
         if (empty($this->mainRepository->getRow($id))) {

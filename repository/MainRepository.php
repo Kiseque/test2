@@ -41,6 +41,13 @@ class MainRepository
         return $this->dbConnect->query($sql, $params);
     }
 
+    public function getByName (string $name): array
+    {
+        $sql = file_get_contents(__DIR__ . '/sql/getByName.sql');
+        $params = [[$name, 'string']];
+        return $this->dbConnect->query($sql, $params);
+    }
+
     public function deleteRow(int $id): void
     {
         $sql = file_get_contents(__DIR__ . '/sql/deleteRow.sql');

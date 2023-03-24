@@ -123,9 +123,10 @@ class DocumentService extends BaseService
         $pdf = new Fpdf();
         $pdf->AddPage();
         $pdf->SetFont(Constants::PDF_FONT, Constants::PDF_BOLD_FONT, Constants::PDF_SIZE_FONT);
-        $pdf->Cell(40, 8, 'ID', 1, null, 'C');
-        $pdf->Cell(40, 8, 'TreeName', 1, null, 'C');
-        $pdf->Cell(40, 8, 'ObserverName', 1, null, 'C');
+        $titles = ['ID', 'TreeName', 'ObserverName'];
+        foreach ($titles as $item) {
+            $pdf->Cell(40, 8, $item, 1, null, 'C');
+        }
         $result = array_map('self::idReplaceWithNames', $this->observationService->getAllObservations());
         $pdf->SetFont(Constants::PDF_FONT, null, 14);
         foreach ($result as $value) {
@@ -143,5 +144,39 @@ class DocumentService extends BaseService
         $result['ObserverID'] = $observer[$result['ObserverID']];
         $result['TreeID'] = $tree[$result['TreeID']];
         return $result;
+    }
+
+    public function wordCreateObservation(): void
+    {
+        $word = new PhpWord();
+        $section = $word->addSection();
+        $table = $section->addTable(Constants::WORD_TABLE_STYLE);
+        $table->addRow();
+        $output = array_map('self::idReplaceWithNames', $this->observationService->getAllObservations());
+        $titles = ['ID', 'TreeName', 'ObserverName'];
+        foreach ($titles as $item)
+        {
+            $cell = $table->addCell(2000);
+            $cell->addText($item, Constants::WORD_CELL_FONT, Constants::ALIGN_CENTER);
+        }
+        foreach ($output as $value) {
+            $table->addRow();
+            foreach ($value as $key => $value2) {
+                $cell = $table->addCell(2000);
+                if ($key == "TreeID" && !empty($this->mainService->getByParent($value2))) {
+                    $footnote = $cell->addFootnote();
+                    $footnote->addText('Родитель');
+                }
+                $cell->addText($value2, Constants::WORD_CELL_FONT, Constants::ALIGN_CENTER);
+            }
+        }
+        header("Content-Description: File Transfer");
+        header('Content-Disposition: attachment; filename="' . Constants::WORD_FILE_NAME . date('_d.m.Y_H:i:s') . '.docx' .'"');
+        header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        header('Content-Transfer-Encoding: binary');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Expires: 0');
+        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($word, 'Word2007');
+        $objWriter->save('php://output');
     }
 }
