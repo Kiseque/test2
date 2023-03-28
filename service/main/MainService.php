@@ -138,7 +138,7 @@ class MainService extends BaseService
         $result = $this->getTree();
         $html = '<table border="1" width="300" style="border-collapse:collapse;">';
         $html .= '<tr>';
-        foreach ($result[0] as $key=>$value){
+        foreach ($result[0] as $key => $value){
             $html .= '<th style="text-align:center;">' . htmlspecialchars($key) . '</th>';
         }
         $html .= '</tr>';

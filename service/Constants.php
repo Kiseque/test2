@@ -14,4 +14,5 @@ class Constants
     const XLSX_FILE_NAME = 'TreeXlsx';
     const CSV_FILE_NAME = 'TreeCsv';
     const WORD_FILE_NAME = 'TreeWord';
+    const WORD_FILE_NAME_OBS = 'ObsWord';
 }

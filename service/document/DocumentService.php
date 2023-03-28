@@ -1,6 +1,7 @@
 <?php
 
 namespace app\service\document;
+
 use app\service\BaseService;
 use app\service\Constants;
 use app\service\main\MainService;
@@ -14,7 +15,6 @@ use PhpOffice\PhpWord\Reader\Word2007;
 
 class DocumentService extends BaseService
 {
-
     private MainService $mainService;
     private ObservationService $observationService;
     private ObserverService $observerService;
@@ -64,9 +64,9 @@ class DocumentService extends BaseService
         $spreadsheet = new Spreadsheet();
         $result = $this->mainService->getTree();
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->fromArray(array_keys ($result[0]),NULL, 'A1');
-        foreach ($result as $key=>$results) {
-            $sheet->fromArray($results, NULL, 'A'.$key+2);
+        $sheet->fromArray(array_keys($result[0]),null, 'A1');
+        foreach ($result as $key => $results) {
+            $sheet->fromArray($results, null, 'A'. $key + 2);
         }
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
@@ -78,7 +78,7 @@ class DocumentService extends BaseService
         $pdf->AddPage();
         $pdf->SetFont(Constants::PDF_FONT, Constants::PDF_BOLD_FONT, Constants::PDF_SIZE_FONT);
         $result = $this->mainService->getTree();
-        foreach ($result[0] as $key=>$value) {
+        foreach ($result[0] as $key => $value) {
             $pdf->Cell(40, 8, $key, 1, null, 'C');
         }
         $pdf->SetFont(Constants::PDF_FONT, null, 14);
@@ -97,7 +97,7 @@ class DocumentService extends BaseService
         $table = $section->addTable(Constants::WORD_TABLE_STYLE);
         $table->addRow();
         $output = $this->mainService->getTree();
-        foreach ($output[0] as $key=>$value) {
+        foreach ($output[0] as $key => $value) {
             $cell = $table->addCell(2000);
             $cell->addText($key, Constants::WORD_CELL_TITLE_FONT, Constants::ALIGN_CENTER);
         }
@@ -108,12 +108,8 @@ class DocumentService extends BaseService
                 $cell->addText($item2, Constants::WORD_CELL_FONT, Constants::ALIGN_CENTER);
             }
         }
-        header("Content-Description: File Transfer");
         header('Content-Disposition: attachment; filename="' . Constants::WORD_FILE_NAME . date('_d.m.Y_H:i:s') . '.docx' .'"');
         header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-        header('Content-Transfer-Encoding: binary');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Expires: 0');
         $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($word, 'Word2007');
         $objWriter->save('php://output');
     }
@@ -163,20 +159,23 @@ class DocumentService extends BaseService
             $table->addRow();
             foreach ($value as $key => $value2) {
                 $cell = $table->addCell(2000);
-                if ($key == "TreeID" && !empty($this->mainService->getByParent($value2))) {
+                if ($key == "TreeID" && $this->noParentsCheck($value2)) {
                     $footnote = $cell->addFootnote();
-                    $footnote->addText('Родитель');
+                    $footnote->addText('Вершина');
                 }
                 $cell->addText($value2, Constants::WORD_CELL_FONT, Constants::ALIGN_CENTER);
             }
         }
-        header("Content-Description: File Transfer");
-        header('Content-Disposition: attachment; filename="' . Constants::WORD_FILE_NAME . date('_d.m.Y_H:i:s') . '.docx' .'"');
+        header('Content-Disposition: attachment; filename="' . Constants::WORD_FILE_NAME_OBS . date('_d.m.Y_H:i:s') . '.docx' .'"');
         header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-        header('Content-Transfer-Encoding: binary');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Expires: 0');
         $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($word, 'Word2007');
         $objWriter->save('php://output');
     }
+
+    private function noParentsCheck (string $name): bool
+    {
+        $temp = $this->mainService->getByName($name);
+        return $temp[0]['Parent_ID'] == 0;
+    }
 }
+

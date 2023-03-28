@@ -1,6 +1,7 @@
 <?php
 
 namespace app\repository;
+
 use app\dbConnect;
 
 class ObservationRepository

@@ -9,10 +9,7 @@ use app\controller\ObservationController;
 
 $main = new MainController();
 
-extract (checkAndPrepareParams($_REQUEST,
-[
-    'act', 'method'
-]));
+extract (checkAndPrepareParams($_REQUEST, ['act', 'method']));
 
 switch ($act) {
     case 'main':
@@ -94,30 +91,30 @@ function documentFunctions($method)
 
 function observerFunctions($method)
 {
-        $observer = new ObserverController();
-        switch ($method) {
-            case 'getAllObservers':
-                $observer->getAllObservers();
-                break;
-            case 'getObserver':
-                extract(checkAndPrepareParams($_REQUEST, ['id']));
-                $observer->getObserver($id);
-                break;
-            case 'deleteObserver':
-                extract(checkAndPrepareParams($_REQUEST, ['id']));
-                $observer->deleteObserver($id);
-                break;
-            case 'insertObserver':
-                extract(checkAndPrepareParams($_REQUEST, ['name']));
-                $observer->insertObserver($name);
-                break;
-            case 'updateObserver':
-                extract(checkAndPrepareParams($_REQUEST, ['id', 'name']));
-                $observer->updateObserver($name, $id);
-                break;
-            default:
-                throw new Exception('Unknown observer function');
-        }
+    $observer = new ObserverController();
+    switch ($method) {
+        case 'getAllObservers':
+            $observer->getAllObservers();
+            break;
+        case 'getObserver':
+            extract(checkAndPrepareParams($_REQUEST, ['id']));
+            $observer->getObserver($id);
+            break;
+        case 'deleteObserver':
+            extract(checkAndPrepareParams($_REQUEST, ['id']));
+            $observer->deleteObserver($id);
+            break;
+        case 'insertObserver':
+            extract(checkAndPrepareParams($_REQUEST, ['name']));
+            $observer->insertObserver($name);
+            break;
+        case 'updateObserver':
+            extract(checkAndPrepareParams($_REQUEST, ['id', 'name']));
+            $observer->updateObserver($name, $id);
+            break;
+        default:
+            throw new Exception('Unknown observer function');
+    }
 }
 
 function observationFunctions($method)

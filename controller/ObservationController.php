@@ -46,5 +46,4 @@ class ObservationController
     {
         $this->observationService->updateObservation($treeId, $observerId, $id);
     }
-
 }

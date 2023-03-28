@@ -75,5 +75,4 @@ class MainRepository
         $params = [[$name, 'string'], [$parentId, 'int'], [$id, 'int']];
         $this->dbConnect->query($sql, $params);
     }
-
 }
