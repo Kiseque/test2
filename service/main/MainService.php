@@ -28,7 +28,7 @@ class MainService extends BaseService
 
     public function getRow(int $id): array
     {
-        return $this->mainRepository->getRow($id);
+        return array_map('self::mb_ucfirst_arr', $this->mainRepository->getRow($id));
     }
 
     public function getByName(string $name): array

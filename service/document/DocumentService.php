@@ -56,7 +56,7 @@ class DocumentService extends BaseService
             }
         }
     }
-    function xlsxCreate(): void
+    public function xlsxCreate(): void
     {
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment;filename="' . Constants::XLSX_FILE_NAME . date('_d.m.Y_H:i:s') . '.xlsx' .'"');
@@ -81,11 +81,17 @@ class DocumentService extends BaseService
         foreach ($result[0] as $key => $value) {
             $pdf->Cell(40, 8, $key, 1, null, 'C');
         }
+        $pdf->Cell(40, 8, 'Parent Name', 1, null, 'C');
         $pdf->SetFont(Constants::PDF_FONT, null, 14);
         foreach ($result as $value) {
             $pdf->Ln();
-            foreach ($value as $item)
-            $pdf->Cell(40, 8, $item, 1, null, 'C');
+            foreach ($value as $key2 => $item) {
+                $pdf->Cell(40, 8, $item, 1, null, 'C');
+                if ($key2 === 'Parent_ID') {
+                    $name = $this->parentNameByParentID($item);
+                    $pdf->Cell(40, 8, $name, 1, null, 'C');
+                }
+            }
         }
         $pdf->Output();
     }
@@ -177,5 +183,10 @@ class DocumentService extends BaseService
         $temp = $this->mainService->getByName($name);
         return $temp[0]['Parent_ID'] == 0;
     }
-}
 
+    private function parentNameByParentID (int $id): string
+    {
+        $parent = $this->mainService->getRow($id);
+        return !empty($parent) ? $parent[0]['Name'] : 'No parent';
+    }
+}
