@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="TreeDisplayStyle.css">
+<head>
+    <meta charset="UTF-8">
+    <title>"Выберите действие"</title>
+</head>
+<body>
+    <form action="/api.php" method="POST">
+        <input name="act" type="hidden" value="main">
+        <input name="method" type="hidden" value="displayTree">
+        <input type="submit" value="Вывести дерево">
+    </form>
+    <form action="/api.php" method="POST">
+        <input name="act" type="hidden" value="document">
+        <input name="method" type="hidden" value="pdfCreate">
+        <input type="submit" value="Создать PDF дерева">
+    </form>
+</body>
+</html>
